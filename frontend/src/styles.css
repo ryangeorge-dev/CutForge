@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@layer base {
+  :root { font-family: system-ui, sans-serif; color: #e5eaf0; background: #11171f; color-scheme: dark; }
+  button, input, select { font: inherit; }
+  button { border: 1px solid #435264; border-radius: .4rem; padding: .45rem .75rem; background: #253140; cursor: pointer; }
+  button:hover:not(:disabled) { background: #34465b; }
+  button:disabled { opacity: .45; cursor: not-allowed; }
+  button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid #74d8c3; outline-offset: 3px; }
+  input, select { display: block; width: 100%; margin-top: .4rem; background: #11171f; border: 1px solid #435264; padding: .55rem; border-radius: .35rem; }
+  label { font-size: .875rem; color: #c1cbd7; }
+  h2 { font-size: 1.1rem; font-weight: 650; margin-bottom: .8rem; }
+  dt { font-size: .8rem; color: #a4b3c4; }
+  dd { margin-top: .25rem; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+  th, td { padding: .7rem .5rem; text-align: left; white-space: nowrap; border-bottom: 1px solid #344151; }
+  th { color: #a4b3c4; background: #1b2530; position: sticky; top: 0; }
+  summary { cursor: pointer; }
+}
+@layer components {
+  .panel { background: #1b2530; border: 1px solid #344151; border-radius: .65rem; padding: 1.25rem; }
+  .muted { color: #a4b3c4; font-size: .875rem; line-height: 1.6; }
+  .notice { background: #243848; border: 1px solid #476279; border-radius: .4rem; padding: .8rem; font-size: .875rem; }
+  .error { background: #432d2c; border-color: #b27770; }
+  .primary { background: #77d8bd; color: #102f28; border-color: #77d8bd; font-weight: 650; }
+  .primary:hover:not(:disabled) { background: #a1e8d5; }
+  .badge { display: inline-block; font-size: .75rem; border: 1px solid #526377; border-radius: .3rem; padding: .25rem .5rem; }
+  .accepted { background: #315347; color: #b4f5d7; }
+  .rejected { background: #3b3a4c; color: #ded5f7; }
+  .pending { background: #54462c; color: #edce94; }
+  .selected-row { background: #2a3c4e; }
+}

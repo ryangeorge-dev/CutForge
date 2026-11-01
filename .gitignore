@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+.pytest_cache/
+node_modules/
+dist/
+# Local media/projects and reproducible generated samples (not test fixtures).
+/workspace/
+/samples/
+*.pyc
+.DS_Store
+
+# Local environment values; only sanitized examples belong in Git.
+.env
+.env.*
+!.env.example
