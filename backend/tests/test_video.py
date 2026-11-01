@@ -35,12 +35,21 @@ def test_video_pipeline(tmp_path, wav, encode, extension, rate, audio):
     expected = timeline(cuts, metadata.duration_ticks)
     clips = root.findall(".//asset-clip")
     assert len(clips) == len(expected)
+    assert Fraction(root.find(".//sequence").get("duration")[:-1]) == sum(c.duration for c in expected) / Fraction(rate)
+    offset = Fraction(0)
     for node, clip in zip(clips, expected):
+        assert Fraction(node.get("offset")[:-1]) == offset
+        offset += Fraction(node.get("duration")[:-1])
         assert node.get("start") == xml_time(clip.source_start, Fraction(rate))
         assert node.get("duration") == xml_time(clip.duration, Fraction(rate))
         # One asset-clip references both streams: no independent audio boundary
         # can drift from the video boundary.
         assert node.get("ref") == "r2"
+        if audio:
+            mapping, = node.findall("audio-channel-source")
+            assert mapping.get("srcCh") == "1"
+        else:
+            assert not node.findall("audio-channel-source")
         assert (Fraction(node.get("start")[:-1]) * Fraction(rate)).denominator == 1
     if not audio:
         assert not root.findall(".//audio")

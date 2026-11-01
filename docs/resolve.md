@@ -1,6 +1,6 @@
 # Resolve import and compatibility
 
-**Status: generated XML passes automated structural and edit-range checks. Actual Resolve import remains pending manual verification. Do not treat DTD validation as Resolve compatibility certification.**
+**Status: the user has confirmed successful verification of the updated mono WAV export through the website and DaVinci Resolve 21, following the ten-clip A/B experiment and the 265-clip production export. Other media/channel workflows remain pending manual verification. See [frame alignment and its audio trade-offs](export-alignment.md). DTD validation alone is not playback certification.**
 
 ## Interchange choice
 
@@ -19,7 +19,7 @@ Sources consulted before implementation:
 2. Open DaVinci Resolve and create a new local project for the first test.
 3. Choose **File → Import → Timeline…**. On macOS the shortcut is **Shift+Command+I**; on Windows use the menu.
 4. Select the downloaded `cutforge.fcpxml`. Choose the FCPXML filter if needed, then **Import**.
-5. In the timeline import options, enable automatic source-clip import. Match the video's frame rate and use sizing information from the source/timeline. For audio-only exports, the sequence timebase is 25 fps; source audio remains at its original sample rate.
+5. In the timeline import options, enable automatic source-clip import. Match the video's frame rate and use sizing information from the source/timeline. For audio-only exports, the sequence timebase is 25 fps; source audio remains at its original sample rate, but exported edit boundaries are frame-aligned and can differ from saved sample-accurate decisions.
 6. Confirm the import. If media is offline, locate the project `source.ext` in CutForge's displayed persistent media location and relink it in the Media Pool.
 7. Check source in/out ranges, overall duration, rejected silence retention, and A/V synchronization. Scrub and trim an imported clip to verify that it is editable source media.
 8. Save the Resolve project. CutForge can be closed; references still point to the persistent workspace.
@@ -36,6 +36,7 @@ Manual matrix:
 
 | Fixture | Inspect in Resolve | Status |
 |---|---|---|
+| WAV 48 kHz mono with BWF origin | Website export and Resolve 21 import after frame alignment | User-confirmed |
 | WAV 44.1 kHz mono | Exact in/out timing, source reference, no video source | Pending |
 | WAV 48 kHz stereo | Both channels and rejected middle silence retained | Pending |
 | MP3 | Decoder delay, in/out alignment and duration | Pending |
@@ -46,4 +47,4 @@ Manual matrix:
 
 ## Limits
 
-No effects, transitions, fades, source timecode translation, color-management transforms, or complex track routing are serialized. Hard cuts can click; padding reduces aggressive speech cuts but is not a crossfade. Audio-only timing is serialized to samples; a receiving editor may interpret subframe edits differently. Multichannel source counts are preserved; confirm channel routing manually. HDR sources are flagged for manual color management. Moving media or exporting to another computer requires relinking.
+No effects, transitions, fades, color-management transforms, or complex track routing are serialized. Broadcast Wave source time references are preserved at export; nonzero video timecode is still rejected on import. Hard cuts can click; padding reduces aggressive speech cuts but is not a crossfade. Audio-only exports shift source edges to make the timeline frame-aligned; saved decisions and CutForge playback/estimates remain sample-accurate. Export blocks a segment that collapses to zero frames instead of silently discarding it. See the alignment report in the XML comment/backend log and the [documented limits](export-alignment.md). Multichannel source counts are preserved; confirm channel routing manually. HDR sources are flagged for manual color management. Moving media or exporting to another computer requires relinking.

@@ -4,7 +4,7 @@ Last updated: **2026-11-01**, America/Toronto.
 
 ## Scope and status
 
-Audio/video processing, source-timestamp editing, the local API, review UI, interactive source timeline, manual boundary adjustments, and editable FCPXML generation are implemented. **Acceptance inside DaVinci Resolve is still pending manual verification.** No rendered video substitutes for timeline export.
+Audio/video processing, source-timestamp editing, the local API, review UI, interactive source timeline, manual boundary adjustments, and editable FCPXML generation are implemented. **The user confirmed the updated mono WAV export through the website and DaVinci Resolve 21.** Other media/channel workflows remain pending manual verification. No rendered video substitutes for timeline export.
 
 The resumed implementation preserved the existing modules and projects. Baseline checks passed before changes: 28 backend tests, 7 frontend tests, and the production build. The additions extend the existing review commands and preview component.
 
@@ -12,7 +12,7 @@ The resumed implementation preserved the existing modules and projects. Baseline
 
 | Command | Actual result |
 |---|---|
-| `.venv/bin/python -m pytest -q` | **41 passed in 7.75 s**, including the WAV/MP3/MP4/MOV/video-only HTTP workflow matrix |
+| `.venv/bin/python -m pytest -q` | **76 passed**, including export alignment, BWF origin, channel mapping, diagnostics and the WAV/MP3/MP4/MOV/video-only HTTP workflow matrix |
 | `npm --prefix frontend test` | 11 passed across 4 files, Vitest 5.0.5 |
 | `npm --prefix frontend run build` | TypeScript check and Vite 8.3.5 production build passed |
 | `npm audit` / patched dependency install, initial implementation | 0 advisories after updating Vite/Vitest; not a continuing security guarantee |
@@ -36,10 +36,12 @@ One upstream Starlette/httpx deprecation warning remains in Pytest. No failed as
 - The live MP4 review exported successfully: the backend returned HTTP 200 after validation and Safari completed the FCPXML download. Importing that download into Resolve is still pending.
 - Synthetic files and persistent demo projects were created with `scripts/generate_samples.py --projects`. Source media was never modified by review/export.
 
-## Resolve attempt and outstanding checks
+## Resolve verification and outstanding checks
 
-Resolve **21.0.0** was installed. A separate **CutForge MVP Verification** project was created. Its native timeline-import picker listed the generated FCPXML but left Import disabled, including with the explicit FCPXML filter. No successful import was observed. The external scripting API returned no connection. A subsequent native-app retry timed out on 2026-11-01. These observations do not establish that the file format is accepted or rejected by Resolve's importer.
+Following the earlier attempt below, the user performed the mono ten-clip A/B experiment and confirmed that frame alignment resolves the alternating-track behavior. After the production fix and 265-clip verification export, the user reported successful verification through the website and Resolve 21. This is user-reported manual evidence for the tested mono WAV workflow; it does not establish every format/channel combination or the importer's internal rounding behavior. See [export-alignment.md](export-alignment.md).
 
-Pending: actual audio/video/video-only imports, source ranges and duration inside Resolve, subframe audio behavior, A/V sync over multiple cuts, editable trimming, 5.1 channel routing, and source relinking after moving a workspace. Follow [resolve.md](resolve.md) and record the exact Resolve build and results. Windows installation and shutdown also require testing on Windows.
+Earlier implementation attempt: Resolve **21.0.0** was installed. A separate **CutForge MVP Verification** project was created. Its native timeline-import picker listed the generated FCPXML but left Import disabled, including with the explicit FCPXML filter. No successful import was observed in that attempt. The external scripting API returned no connection. A subsequent native-app retry timed out on 2026-11-01. These earlier observations do not establish that the file format is accepted or rejected by Resolve's importer.
+
+Pending: other audio formats/channel layouts, video/video-only imports, A/V sync over multiple cuts, 5.1 channel routing, and source relinking after moving a workspace. Repeat source-range, duration and editable-trimming checks for those workflows. Follow [resolve.md](resolve.md) and record the exact Resolve build and results. Windows installation and shutdown also require testing on Windows.
 
 See [checklist.md](checklist.md) and [limitations.md](limitations.md) for the remaining acceptance items and deliberately unsupported media characteristics.

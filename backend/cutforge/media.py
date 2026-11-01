@@ -21,10 +21,31 @@ def run(args: list[str], timeout: int = 7200) -> subprocess.CompletedProcess:
     except FileNotFoundError as exc:
         raise MediaError(f"Missing {args[0]}. Install FFmpeg and add ffmpeg/ffprobe to PATH.") from exc
     except subprocess.TimeoutExpired as exc:
-        raise MediaError("Media processing exceeded two hours. Try a shorter recording.") from exc
+        raise MediaError(f"Media processing exceeded {timeout} seconds. Try a shorter recording.") from exc
     if result.returncode:
         raise MediaError("Media could not be decoded: " + result.stderr[-1500:])
     return result
+
+
+def source_origin(path: Path, metadata: Metadata) -> Fraction:
+    """BWF's first sample is timed from midnight, not the start of the file.
+
+    Read at export so existing projects need no migration. Edit decisions remain
+    zero-relative. Nonzero video timecodes are already rejected during import.
+    """
+    if metadata.has_video or path.suffix.lower() != ".wav":
+        return Fraction(0)
+    data = json.loads(run([
+        "ffprobe", "-v", "error", "-select_streams", "a:0", "-show_entries",
+        "stream=sample_rate:format_tags=time_reference", "-of", "json", str(path),
+    ], timeout=30).stdout)
+    streams = data.get("streams", [])
+    if len(streams) != 1 or int(streams[0].get("sample_rate", 0)) != metadata.sample_rate:
+        raise MediaError("WAV sample rate no longer matches the imported project.")
+    reference = data.get("format", {}).get("tags", {}).get("time_reference", "0")
+    if not str(reference).isdigit() or int(reference) > 2**64 - 1:
+        raise MediaError("Invalid Broadcast Wave time reference.")
+    return Fraction(int(reference), metadata.sample_rate)
 
 
 def probe(path: Path) -> Metadata:

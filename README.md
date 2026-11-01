@@ -2,7 +2,7 @@
 
 A local rough-cut assistant for DaVinci Resolve. Import one WAV, MP3, MP4, or MOV recording; detect silence with FFmpeg; audition transitions; approve edits; export an editable FCPXML timeline referencing a persistent copy of your media.
 
-**Implementation status:** audio/video pipelines and review UI are implemented with automated tests. Actual Resolve import is **pending manual verification**. See [validation results](docs/validation.md), [requirement checklist](docs/checklist.md), and [known limitations](docs/limitations.md).
+**Implementation status:** audio/video pipelines and review UI are implemented with automated tests. The user has verified the updated mono WAV export through the website and DaVinci Resolve 21. Other media/channel workflows still need manual Resolve verification. See [validation results](docs/validation.md), [requirement checklist](docs/checklist.md), and [known limitations](docs/limitations.md).
 
 ## Install
 

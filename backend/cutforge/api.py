@@ -1,4 +1,5 @@
 import os
+import logging
 from contextlib import asynccontextmanager
 from fractions import Fraction
 from pathlib import Path
@@ -11,7 +12,7 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from .analysis import analyze
 from .engine import normalize
-from .export import export_fcpxml
+from .export import ExportDecisionError, export_fcpxml
 from .jobs import Jobs
 from .media import SUPPORTED, probe
 from .models import Project, AnalysisRequest, ReviewRequest
@@ -19,6 +20,7 @@ from .review import merge_analysis, review
 from .store import Store
 
 ORIGIN = "http://127.0.0.1:5173"
+logger = logging.getLogger(__name__)
 
 
 def create_app(root: Path | None = None) -> FastAPI:
@@ -174,7 +176,24 @@ def create_app(root: Path | None = None) -> FastAPI:
     def export(identifier: str, revision: int):
         with store.lock:
             project = writable(identifier, revision)
-            xml = export_fcpxml(project, store.media(project))
+            try:
+                try:
+                    media = store.media(project)
+                except ValueError as exc:
+                    # Store errors are curated missing/changed/invalid-path messages.
+                    raise HTTPException(400, str(exc)) from exc
+                xml = export_fcpxml(project, media)
+            except HTTPException:
+                raise
+            except ExportDecisionError as exc:
+                raise HTTPException(400, str(exc)) from exc
+            except Exception as exc:
+                # Keep probe paths, XML contents and tracebacks in the local log.
+                diagnostic = uuid4().hex[:12]
+                logger.exception("FCPXML export failed: diagnostic=%s project=%s revision=%s",
+                                 diagnostic, identifier, revision)
+                raise HTTPException(500, f"Timeline export failed (diagnostic {diagnostic}). "
+                                    "Check the local backend log, media permissions, and FFmpeg installation.") from exc
             return Response(xml, media_type="application/xml",
                             headers={"Content-Disposition": 'attachment; filename="cutforge.fcpxml"', "X-CutForge-Validation": "DTD-and-edit-ranges"})
 

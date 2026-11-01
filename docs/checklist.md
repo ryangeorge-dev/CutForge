@@ -10,10 +10,11 @@
 - [x] Real FFmpeg `silencedetect`, configurable threshold/minimum/padding
 - [x] Leading, middle, trailing, no-silence and all-silence behavior
 - [x] Pure normalization, clamping, merging, complementary keep intervals
-- [x] Integer sample timing and rational FCPXML serialization
+- [x] Integer sample decisions and rational, frame-aligned FCPXML export with reported edge changes
 - [x] Audio-only FCPXML with DTD/source-range validation
 - [x] Reject malformed/unsupported media with useful errors
-- [ ] Actual Resolve audio import and subframe timing verification
+- [x] User-confirmed mono WAV website export and Resolve 21 import after the frame-alignment fix
+- [ ] Manual Resolve verification of other audio formats/channel layouts
 
 ## Phase 2: video
 
